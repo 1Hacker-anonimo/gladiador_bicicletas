@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel Admin - O Valdim</title>
+    <link rel="stylesheet" href="css/admin.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+</head>
+
+<body>
+
+    <!-- Sidebar -->
+    <nav class="sidebar">
+        <div class="sidebar-header">
+            <i class="fas fa-bicycle"></i> Admin Panel
+        </div>
+        <div class="sidebar-menu">
+            <a class="menu-item active" data-target="dashboard">
+                <i class="fas fa-home"></i> Início
+            </a>
+            <a class="menu-item" data-target="visual">
+                <i class="fas fa-palette"></i> Visual do Site
+            </a>
+            <a class="menu-item" data-target="links">
+                <i class="fas fa-link"></i> Gerenciar Links
+            </a>
+            <a class="menu-item" data-target="perfil">
+                <i class="fas fa-id-card"></i> Identidade
+            </a>
+            <!-- Configurações do Admin (Opcional, conforme pedido) -->
+            <a class="menu-item" data-target="config">
+                <i class="fas fa-cog"></i> Config. Painel
+            </a>
+        </div>
+        <div class="logout-btn" id="logout-btn">
+            <i class="fas fa-sign-out-alt"></i> Sair
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+
+        <!-- Header Mobile (Hamburger) seria aqui se necessário -->
+        <div class="main-header">
+            <h1 id="page-title">Visão Geral</h1>
+            <div class="user-info">
+                <span id="user-email">Carregando...</span>
+            </div>
+        </div>
+
+        <!-- SEÇÃO: DASHBOARD -->
+        <div id="dashboard" class="section-content active">
+            <div class="card">
+                <h3>Bem-vindo ao Painel de Controle</h3>
+                <p>Selecione uma opção no menu lateral para começar a editar seu cartão de visita digital.</p>
+            </div>
+            <div style="display: flex; gap: 20px; flex-wrap: wrap;">
+                <div class="card" style="flex: 1; min-width: 200px; text-align: center;">
+                    <i class="fas fa-eye fa-2x" style="color: var(--admin-accent); margin-bottom: 10px;"></i>
+                    <h4>Site Público</h4>
+                    <p style="margin-top: 10px;">Visualizar como seu site está agora.</p>
+                    <a href="../index.html" target="_blank" class="btn-primary"
+                        style="display: inline-block; margin-top: 15px; text-decoration: none;">Ver Site</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- SEÇÃO: VISUAL -->
+        <div id="visual" class="section-content">
+            <div class="card">
+                <h3>Plano de Fundo (Background)</h3>
+                <form id="visual-form">
+                    <div class="form-group">
+                        <label>Cor de Fundo (Fallback)</label>
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <input type="color" id="bg-color" style="width: 60px; height: 40px; padding: 0;">
+                            <input type="text" id="bg-color-text" placeholder="#000000">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Imagem de Fundo (URL)</label>
+                        <input type="text" id="bg-image-url" placeholder="https://exemplo.com/imagem.jpg">
+                        <small style="color: #888;">Cole o link direto da imagem. Recomendado: Imagens em alta
+                            resolução.</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Preview da Imagem</label>
+                        <div id="bg-preview"
+                            style="width: 100%; height: 200px; background-color: #333; background-size: cover; background-position: center; border-radius: 8px; border: 2px dashed #555;">
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn-primary btn-action">
+                        <i class="fas fa-save"></i> Salvar Alterações
+                    </button>
+                    <span id="visual-msg" style="margin-left: 10px; opacity: 0; transition: opacity 0.5s;">Salvo!</span>
+                </form>
+            </div>
+        </div>
+
+        <!-- SEÇÃO: LINKS (BOTÕES) -->
+        <div id="links" class="section-content">
+            <div class="card">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <h3>Gerenciar Botões</h3>
+                    <!-- Botão de adicionar novo link se quisermos expandir no futuro, 
+                         mas o user pediu especificamente para editar os existentes. 
+                         Vou focar em listar os existentes editáveis. -->
+                </div>
+                <form id="links-form">
+                    <div id="links-list">
+                        <!-- Links serão injetados via JS -->
+                        <p style="text-align: center; color: #888;">Carregando links...</p>
+                    </div>
+
+                    <button type="submit" class="btn-primary btn-action">
+                        <i class="fas fa-save"></i> Salvar Todos os Links
+                    </button>
+                    <span id="links-msg" style="margin-left: 10px; opacity: 0; transition: opacity 0.5s;">Salvo!</span>
+                </form>
+            </div>
+        </div>
+
+        <!-- SEÇÃO: PERFIL (IDENTIDADE) -->
+        <div id="perfil" class="section-content">
+            <div class="card">
+                <h3>Identidade do Negócio</h3>
+                <form id="identity-form">
+                    <div class="form-group" style="text-align: center;">
+                        <div id="logo-preview-container"
+                            style="width: 120px; height: 120px; border-radius: 50%; overflow: hidden; margin: 0 auto 15px; border: 3px solid var(--admin-accent); background: #fff;">
+                            <img id="logo-preview" src="" alt="Logo"
+                                style="width: 100%; height: 100%; object-fit: cover;">
+                        </div>
+                        <label>URL do Logo (Imagem Circular)</label>
+                        <input type="text" id="logo-url" placeholder="https://..." style="text-align: center;">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Nome da Empresa</label>
+                        <input type="text" id="brand-name" placeholder="Ex: O Valdim Bicicletaria">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Descrição Curta (Bio)</label>
+                        <textarea id="brand-desc" rows="3" placeholder="Ex: Seu próximo pedal começa aqui."></textarea>
+                        <small style="color: #666; float: right;">Max: 100 caracteres</small>
+                    </div>
+
+                    <div style="clear: both; padding-top: 15px;">
+                        <button type="submit" class="btn-primary btn-action">
+                            <i class="fas fa-save"></i> Atualizar Identidade
+                        </button>
+                        <span id="identity-msg"
+                            style="margin-left: 10px; opacity: 0; transition: opacity 0.5s;">Salvo!</span>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- SEÇÃO: CONFIG PAINEL -->
+        <div id="config" class="section-content">
+            <div class="card">
+                <h3>Personalizar Painel Admin</h3>
+                <p style="margin-bottom: 20px; color: #aaa;">Escolha as cores que você preferir para sua área
+                    administrativa.</p>
+                <form id="admin-config-form">
+                    <div class="form-group">
+                        <label>Cor do Menu Lateral</label>
+                        <input type="color" id="admin-sidebar-color" value="#16213e">
+                    </div>
+                    <div class="form-group">
+                        <label>Cor de Destaque (Botões/Links)</label>
+                        <input type="color" id="admin-accent-color" value="#e94560">
+                    </div>
+                    <button type="submit" class="btn-primary btn-action">
+                        <i class="fas fa-paint-brush"></i> Aplicar Tema
+                    </button>
+                    <button type="button" id="reset-theme"
+                        style="margin-left: 10px; background: transparent; border: 1px solid #666; padding: 10px 15px; color: #ccc; border-radius: 6px; cursor: pointer;">
+                        Restaurar Padrão
+                    </button>
+                </form>
+            </div>
+        </div>
+
+    </main>
+
+    <script src="../js/supabase-config.js"></script>
+    <script src="js/auth.js"></script> <!-- Auth check happens first -->
+    <script src="js/dashboard.js"></script>
+</body>
+
+</html>
